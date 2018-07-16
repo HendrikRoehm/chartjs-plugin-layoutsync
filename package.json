@@ -1,0 +1,11 @@
+{
+  "name": "chartjs-plugin-layoutsync",
+  "version": "0.0.1",
+  "description": "Chart.js plugin to sync layouts between charts",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Hendrik Roehm",
+  "license": "MIT"
+}
