@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Layout Sync</title>
+  <script src="../node_modules/chart.js/dist/Chart.js"></script>
+  <script src="../src/chart.layoutsync.js"></script>
+  <style>
+  canvas {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+  }
+  </style>
+</head>
+
+<body>
+  <div>
+    <canvas id="canvas1"></canvas>
+  </div>
+  <div>
+    <canvas id="canvas2"></canvas>
+  </div>
+  <div>
+    <canvas id="canvas3"></canvas>
+  </div>
+  <script>
+    function randomValue() {
+      return Math.random();
+    }
+    function generateConfig(amountLeft, amountRight, layoutGroup) {
+      var datasets = [];
+      var axes = [];
+      for (var i=0; i<amountLeft; i++) {
+        datasets.push({
+          label: "Dataset Left " + i.toString(),
+          data: [randomValue(), randomValue()],
+          fill: false,
+          yAxisID: "L"+i.toString()
+        })
+        axes.push({
+          id: "L"+i.toString(),
+          type: "linear",
+          position: "left"
+        });
+      }
+      for (var i=0; i<amountRight; i++) {
+        datasets.push({
+          label: "Dataset Right " + i.toString(),
+          data: [randomValue(), randomValue()],
+          fill: false,
+          yAxisID: "R"+i.toString()
+        })
+        axes.push({
+          id: "R"+i.toString(),
+          type: "linear",
+          position: "right"
+        });
+      }
+
+      return {
+        type: 'line',
+        data: {
+          datasets: datasets
+        },
+        options: {
+          height: 200,
+          responsive: true,
+          maintainAspectRatio: false,
+          title:{
+            display:true,
+            text:"Chart.js Layout Sync"
+          },
+          scales: {
+            yAxes: axes
+          },
+          layoutsync: {
+            group: layoutGroup
+          }
+        }
+      };
+    }
+    window.onload = function() {
+      var ctx1 = document.getElementById("canvas1").getContext("2d");
+      var ctx2 = document.getElementById("canvas2").getContext("2d");
+      var charts = [
+        new Chart(ctx1, generateConfig(1, 2, "sync1")),
+        new Chart(ctx2, generateConfig(2, 1, "sync1"))
+      ];
+      window.charts = charts;
+    };
+  </script>
+</body>
+
+</html>
