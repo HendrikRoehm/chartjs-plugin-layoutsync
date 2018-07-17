@@ -33,31 +33,29 @@ const layoutsyncPlugin = {
       return;
     }
 
+    // save computed layout
+    chartInstance.initialLayout = {
+      left: chartInstance.chartArea.left,
+      right: chartInstance.chartArea.right
+    };
+    console.log(chartInstance.initialLayout);
+
     var group = layoutGroups[groupId];
 
 //    var layoutOptions = chartInstance.options.layout || {};
 //    var padding = helpers.options.toPadding(layoutOptions.padding);
 
     var maxLeftWidth = 0;
-    var maxRightWidth = 0;
+    var minRightWidth = 1000000;
     group.forEach(chart => {
-      var leftWidth = 0;
-      var rightWidth = 0;
-      chart.boxes.forEach(box => {
-        if (box.position === "left") {
-          leftWidth += box.width;
-        } else if (box.position === "right") {
-          rightWidth += box.width;
-        }
-      });
-      maxLeftWidth = Math.max(maxLeftWidth, leftWidth);
-      maxRightWidth = Math.max(maxRightWidth, rightWidth);
+      maxLeftWidth = Math.max(maxLeftWidth, chart.initialLayout.left);
+      minRightWidth = Math.min(minRightWidth, chart.initialLayout.right);
     })
 
     var chartsToUpdate = [];
     group.forEach(chart => {
       var shiftLeft = maxLeftWidth - chart.chartArea.left;
-      var shiftRight = chart.width - maxRightWidth - chart.chartArea.right;
+      var shiftRight = minRightWidth - chart.chartArea.right;
 
       // adjust chart
       chart.chartArea.left += shiftLeft;

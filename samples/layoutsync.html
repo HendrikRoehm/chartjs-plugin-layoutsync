@@ -24,6 +24,12 @@
   <div>
     <canvas id="canvas3"></canvas>
   </div>
+  <div>
+    <canvas id="canvas4"></canvas>
+  </div>
+  <div>
+    <canvas id="canvas5"></canvas>
+  </div>
   <script>
     function randomValue() {
       return Math.random();
@@ -83,9 +89,13 @@
     window.onload = function() {
       var ctx1 = document.getElementById("canvas1").getContext("2d");
       var ctx2 = document.getElementById("canvas2").getContext("2d");
+      var ctx3 = document.getElementById("canvas3").getContext("2d");
+      var ctx4 = document.getElementById("canvas4").getContext("2d");
       var charts = [
         new Chart(ctx1, generateConfig(1, 2, "sync1")),
-        new Chart(ctx2, generateConfig(2, 1, "sync1"))
+        new Chart(ctx2, generateConfig(2, 1, "sync1")),
+        new Chart(ctx3, generateConfig(1, 0, "sync2")),
+        new Chart(ctx4, generateConfig(0, 0, "sync2")),
       ];
       window.charts = charts;
     };
