@@ -1,6 +1,6 @@
 {
   "name": "chartjs-plugin-layoutsync",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Chart.js plugin to sync layouts between charts",
   "main": "src/chart.layoutsync.js",
   "author": "Hendrik Roehm",
@@ -8,6 +8,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/HendrikRoehm/chartjs-plugin-layoutsync.git"
+  },
+  "scripts": {
+    "build": "node_modules/.bin/gulp build",
+    "bump": "node_modules/.bin/gulp bump"
   },
   "dependencies": {
     "chart.js": "^2.7.2"

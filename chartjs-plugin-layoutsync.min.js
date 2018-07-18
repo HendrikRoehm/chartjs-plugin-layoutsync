@@ -1,7 +1,7 @@
 /*!
  * chartjs-plugin-layoutsync
  * https://github.com/HendrikRoehm/chartjs-plugin-layoutsync/
- * Version: 0.0.1
+ * Version: 0.1.1
  *
  * Copyright 2018 Hendrik Roehm
  * Released under the MIT license
