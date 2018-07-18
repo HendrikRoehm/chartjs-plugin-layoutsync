@@ -1,14 +1,33 @@
 {
   "name": "chartjs-plugin-layoutsync",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Chart.js plugin to sync layouts between charts",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "src/chart.layoutsync.js",
   "author": "Hendrik Roehm",
   "license": "MIT",
-  "devDependencies": {
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HendrikRoehm/chartjs-plugin-layoutsync.git"
+  },
+  "dependencies": {
     "chart.js": "^2.7.2"
+  },
+  "devDependencies": {
+    "browserify": "^16.2.2",
+    "eslint": "^5.1.0",
+    "eslint-config-chartjs": "^0.1.0",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-eslint": "^5.0.0",
+    "gulp-insert": "^0.5.0",
+    "gulp-jshint": "^2.1.0",
+    "gulp-replace": "^1.0.0",
+    "gulp-streamify": "^1.0.2",
+    "gulp-uglify": "^1.5.4",
+    "gulp-util": "^3.0.8",
+    "inquirer": "^6.0.0",
+    "merge-stream": "^1.0.1",
+    "semver": "^5.5.0",
+    "vinyl-source-stream": "^2.0.0"
   }
 }

@@ -4,7 +4,7 @@
 <head>
   <title>Layout Sync</title>
   <script src="../node_modules/chart.js/dist/Chart.js"></script>
-  <script src="../src/chart.layoutsync.js"></script>
+  <script src="..//chartjs-plugin-layoutsync.js"></script>
   <style>
   canvas {
     -moz-user-select: none;
@@ -34,7 +34,7 @@
     function randomValue() {
       return Math.random();
     }
-    function generateConfig(amountLeft, amountRight, layoutGroup) {
+    function generateConfig(title, amountLeft, amountRight, layoutGroup) {
       var datasets = [];
       var axes = [];
       for (var i=0; i<amountLeft; i++) {
@@ -75,7 +75,7 @@
           maintainAspectRatio: false,
           title:{
             display:true,
-            text:"Chart.js Layout Sync"
+            text: title
           },
           scales: {
             yAxes: axes
@@ -92,10 +92,10 @@
       var ctx3 = document.getElementById("canvas3").getContext("2d");
       var ctx4 = document.getElementById("canvas4").getContext("2d");
       var charts = [
-        new Chart(ctx1, generateConfig(1, 2, "sync1")),
-        new Chart(ctx2, generateConfig(2, 1, "sync1")),
-        new Chart(ctx3, generateConfig(1, 0, "sync2")),
-        new Chart(ctx4, generateConfig(0, 0, "sync2")),
+        new Chart(ctx1, generateConfig("Chart 1 Group 1", 1, 2, "sync1")),
+        new Chart(ctx2, generateConfig("Chart 1 Group 1", 2, 1, "sync1")),
+        new Chart(ctx3, generateConfig("Chart 1 Group 2", 1, 0, "sync2")),
+        new Chart(ctx4, generateConfig("Chart 2 Group 2", 0, 0, "sync2")),
       ];
       window.charts = charts;
     };
