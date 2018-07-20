@@ -4,6 +4,7 @@
 <head>
   <title>Layout Sync</title>
   <script src="../node_modules/chart.js/dist/Chart.js"></script>
+  <script src="../node_modules/chartjs-plugin-annotations/chartjs-plugin-annotation.min.js"></script>
   <script src="..//chartjs-plugin-layoutsync.js"></script>
   <style>
   canvas {
@@ -21,12 +22,6 @@
   <div>
     <canvas id="canvas2"></canvas>
   </div>
-  <div>
-    <canvas id="canvas3"></canvas>
-  </div>
-  <div>
-    <canvas id="canvas4"></canvas>
-  </div>
   <script>
     function randomValue() {
       return Math.random();
@@ -37,7 +32,7 @@
       for (var i=0; i<amountLeft; i++) {
         datasets.push({
           label: "Dataset Left " + i.toString(),
-          data: [randomValue(), randomValue()],
+          data: [randomValue(), randomValue(), randomValue()],
           fill: false,
           yAxisID: "L"+i.toString()
         })
@@ -50,7 +45,7 @@
       for (var i=0; i<amountRight; i++) {
         datasets.push({
           label: "Dataset Right " + i.toString(),
-          data: [randomValue(), randomValue()],
+          data: [randomValue(), randomValue(), randomValue()],
           fill: false,
           yAxisID: "R"+i.toString()
         })
@@ -64,6 +59,7 @@
       return {
         type: 'line',
         data: {
+          labels: [0, 1, 2],
           datasets: datasets
         },
         options: {
@@ -79,6 +75,22 @@
           },
           layoutsync: {
             group: layoutGroup
+          },
+          annotation: {
+            annotations: [{
+              id: 'vline',
+              type: 'line',
+              mode: 'vertical',
+              scaleID: 'x-axis-0',
+              value: 1,
+              borderColor: 'red',
+              borderWidth: 2,
+              label: {
+                  backgroundColor: "red",
+                  content: "Test Label",
+                  enabled: true
+              }
+            }]
           }
         }
       };
@@ -86,13 +98,9 @@
     window.onload = function() {
       var ctx1 = document.getElementById("canvas1").getContext("2d");
       var ctx2 = document.getElementById("canvas2").getContext("2d");
-      var ctx3 = document.getElementById("canvas3").getContext("2d");
-      var ctx4 = document.getElementById("canvas4").getContext("2d");
       var charts = [
         new Chart(ctx1, generateConfig("Chart 1 Group 1", 1, 2, "sync1")),
         new Chart(ctx2, generateConfig("Chart 2 Group 1", 2, 1, "sync1")),
-        new Chart(ctx3, generateConfig("Chart 1 Group 2", 1, 0, "sync2")),
-        new Chart(ctx4, generateConfig("Chart 2 Group 2", 0, 0, "sync2")),
       ];
       window.charts = charts;
     };

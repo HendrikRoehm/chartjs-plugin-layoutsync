@@ -1,7 +1,7 @@
 /*!
  * chartjs-plugin-layoutsync
  * https://github.com/HendrikRoehm/chartjs-plugin-layoutsync/
- * Version: 0.1.1
+ * Version: 0.1.2
  *
  * Copyright 2018 Hendrik Roehm
  * Released under the MIT license
@@ -13,6 +13,7 @@
 
 // TODO:
 // * for right scales the ticks are on the right side (wrong)
+// * check https://github.com/chartjs/Chart.js/issues/4982
 
 // Get the chart variable
 var Chart = require('chart.js');
@@ -37,9 +38,14 @@ var layoutsyncPlugin = {
       layoutGroups[groupId] = [chartInstance];
     }
   },
-  afterLayout: function (chartInstance) {
+  afterLayout: function (chartInstance, optionalParameter) {
     var groupId = chartInstance.layoutGroupId
     if (!groupId) {
+      return;
+    }
+
+    if (optionalParameter === "layoutSync") {
+      // afterLayout is triggered through this function, nothing to do.
       return;
     }
 
@@ -84,12 +90,18 @@ var layoutsyncPlugin = {
         }
       })
 
-      if (chartInstance !== chart && (shiftLeft !== 0 || shiftRight !== 0)) {
-        chartsToUpdate.push(chart);
+      if (shiftLeft !== 0 || shiftRight !== 0) {
+        if (chartInstance === chart) {
+          // notify again to distribute the changes
+          Chart.pluginService.notify(chart, "afterLayout", ["layoutSync"]);
+          Chart.pluginService.notify(chart, "afterScaleUpdate");
+        } else {
+          chartsToUpdate.push(chart);
+        }
       }
     });
     chartsToUpdate.forEach(function (chart) {
-      chart.update(0);
+      chart.update();
     });
   },
   destroy: function (chartInstance) {
