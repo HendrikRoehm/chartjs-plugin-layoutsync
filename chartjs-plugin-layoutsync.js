@@ -22,6 +22,13 @@ var helpers = Chart.helpers;
 
 var layoutGroups = {};
 
+// Approach:
+// save layouts
+// compute left and right maximum values
+// on afterLayout check if left and right max values changed
+// if yes, trigger update of other charts
+// Charts always double trigger afterLayout?
+
 var layoutsyncPlugin = {
   beforeInit: function (chartInstance) {
     var options = chartInstance.options;
