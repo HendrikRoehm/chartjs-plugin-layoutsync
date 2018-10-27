@@ -93,18 +93,8 @@ function lintTask() {
     'src/**/*.js'
   ];
 
-  // NOTE(SB) codeclimate has 'complexity' and 'max-statements' eslint rules way too strict
-  // compare to what the current codebase can support, and since it's not straightforward
-  // to fix, let's turn them as warnings and rewrite code later progressively.
-  var options = {
-    rules: {
-      'complexity': [1, 10],
-      'max-statements': [1, 30]
-    }
-  };
-
   return gulp.src(files)
-    .pipe(eslint(options))
+    .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
 }
