@@ -1,3 +1,5 @@
+var Context = require('./jasmine.context');
+var matchers = require('./jasmine.matchers');
 var utils = require('./jasmine.utils');
 
 (function() {
@@ -16,6 +18,10 @@ var utils = require('./jasmine.utils');
 		delete charts[chart.id];
 	}
 
+	function createMockContext() {
+		return new Context();
+	}
+
 	// force ratio=1 for tests on high-res/retina devices
 	// fixes https://github.com/chartjs/Chart.js/issues/4515
 	window.devicePixelRatio = 1;
@@ -23,6 +29,12 @@ var utils = require('./jasmine.utils');
 	window.acquireChart = acquireChart;
 	window.releaseChart = releaseChart;
 	window.waitForResize = utils.waitForResize;
+	window.waitForAllChartResizes = utils.waitForAllChartResizes;
+	window.xLimitsOfChartarea = utils.xLimitsOfChartarea;
+	window.createMockContext = createMockContext;
+	window.acquireChartWithLayoutGroupId = utils.acquireChartWithLayoutGroupId;
+	window.acquireChartWithLayoutGroupIdAndScalePosition = utils.acquireChartWithLayoutGroupIdAndScalePosition;
+	window.acquireTwoSyncedChartsWithOneWrapper = utils.acquireTwoSyncedChartsWithOneWrapper;
 
 	// some style initialization to limit differences between browsers across different plateforms.
 	utils.injectCSS(
@@ -37,6 +49,10 @@ var utils = require('./jasmine.utils');
 
 	jasmine.specsFromFixtures = utils.specsFromFixtures;
 	jasmine.triggerMouseEvent = utils.triggerMouseEvent;
+
+	beforeEach(function() {
+		jasmine.addMatchers(matchers);
+	});
 
 	afterEach(function() {
 		// Auto releasing acquired charts

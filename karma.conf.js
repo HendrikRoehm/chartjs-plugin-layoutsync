@@ -4,7 +4,7 @@ module.exports = function(karma) {
 	var args = karma.args || {};
 	var config = {
 		frameworks: ['browserify', 'jasmine'],
-		reporters: ['progress', 'kjhtml'],
+		reporters: [/*'progress',*/ 'kjhtml'],
 		browsers: ['chrome'],
 
 		// Explicitly disable hardware acceleration to make image

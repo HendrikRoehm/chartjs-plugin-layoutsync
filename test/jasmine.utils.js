@@ -44,7 +44,7 @@ function readImageData(url, callback) {
  * @param {object} options.wrapper - Canvas wrapper attributes.
  * @param {boolean} options.persistent - If true, the chart will not be released after the spec.
  */
-function acquireChart(config, options) {
+function acquireChart(config, options, wrapperOfWrapper) {
 	var wrapper = document.createElement('div');
 	var canvas = document.createElement('canvas');
 	var chart, key;
@@ -53,6 +53,7 @@ function acquireChart(config, options) {
 	options = options || {};
 	options.canvas = options.canvas || {height: 512, width: 512};
 	options.wrapper = options.wrapper || {class: 'chartjs-wrapper'};
+	wrapperOfWrapper = wrapperOfWrapper || window.document.body;
 
 	for (key in options.canvas) {
 		if (options.canvas.hasOwnProperty(key)) {
@@ -73,12 +74,12 @@ function acquireChart(config, options) {
 	config.options.defaultFontFamily = config.options.defaultFontFamily || 'Arial';
 
 	wrapper.appendChild(canvas);
-	window.document.body.appendChild(wrapper);
+	wrapperOfWrapper.appendChild(wrapper);
 
 	try {
 		chart = new Chart(canvas.getContext('2d'), config);
 	} catch (e) {
-		window.document.body.removeChild(wrapper);
+		wrapperOfWrapper.removeChild(wrapper);
 		throw e;
 	}
 
@@ -161,6 +162,31 @@ function waitForResize(chart, callback) {
 	};
 }
 
+function waitForAllChartResizes(charts, callback) {
+	var notYetResizedCharts = [];
+	charts.forEach(function (chart) {
+		notYetResizedCharts.push(chart.id);
+	});
+
+	charts.forEach(function (chart) {
+		waitForResize(chart, handleResizeEvent.bind(this, chart))
+	});
+
+	function handleResizeEvent(chart) {
+		chartIndex = notYetResizedCharts.findIndex(function(element) {
+			return element === chart.id
+		});
+
+		if (chartIndex !== -1) {
+			notYetResizedCharts.splice(chartIndex, 1);
+			
+			if (notYetResizedCharts.length === 0) {
+				callback();
+			}
+		}
+	}
+}
+
 function triggerMouseEvent(chart, type, el) {
 	var node = chart.canvas;
 	var rect = node.getBoundingClientRect();
@@ -175,6 +201,111 @@ function triggerMouseEvent(chart, type, el) {
 	node.dispatchEvent(event);
 }
 
+function xLimitsOfChartarea(chart) {
+	return {
+		left: chart.chartArea.left,
+		right: chart.chartArea.right
+	};
+}
+
+function acquireChartWithLayoutGroupId(layoutGroupId) {
+	return acquireChartWithLayoutGroupIdAndScalePosition(layoutGroupId, "left");
+}
+
+function acquireChartWithLayoutGroupIdAndScalePosition(layoutGroupId, scalePosition) {
+	return window.acquireChart({
+		type: 'bar',
+		data: {
+			datasets: [{
+				yAxisID: 'yScale0',
+				data: [20, 30, 40, 50]
+			}],
+			labels: ['a', 'b', 'c', 'd']
+		},
+		options: {
+			scales: {
+				yAxes: [{
+					id: 'yScale0',
+					type: 'linear',
+					position: scalePosition
+				}]
+			},
+			layoutsync: {
+				group: layoutGroupId
+			}
+		}
+	});
+}
+
+function acquireTwoSyncedChartsWithOneWrapper() {
+	wrapperOfBoth = document.createElement("div");
+		wrapperOfBoth.style = "width: 350px; height: 350px; position: relative;";
+		window.document.body.appendChild(wrapperOfBoth);
+
+		var chart1 = window.acquireChart({
+			type: 'bar',
+			data: {
+				datasets: [{
+					yAxisID: 'yScale0',
+					data: [20, 30, 40, 50]
+				}],
+				labels: ['a', 'b', 'c', 'd']
+			},
+			options: {
+				scales: {
+					yAxes: [{
+						id: 'yScale0',
+						type: 'linear',
+						position: "left"
+					}]
+				},
+				layoutsync: {
+					group: "testGroup"
+				},
+				responsive: true,
+				maintainAspectRatio: false
+			}
+		}, { canvas: {
+			style: ''
+		}, wrapper: {
+			style: "width: 100%; height: 150px;"
+		}}, wrapperOfBoth);
+
+		var chart2 = window.acquireChart({
+			type: 'bar',
+			data: {
+				datasets: [{
+					yAxisID: 'yScale0',
+					data: [20, 30, 40, 50]
+				}],
+				labels: ['a', 'b', 'c', 'd']
+			},
+			options: {
+				scales: {
+					yAxes: [{
+						id: 'yScale0',
+						type: 'linear',
+						position: "right"
+					}]
+				},
+				layoutsync: {
+					group: "testGroup"
+				},
+				responsive: true,
+				maintainAspectRatio: false
+			}
+		}, { canvas: {
+			style: ''
+		}, wrapper: {
+			style: "width: 100%; height: 150px;"
+		}}, wrapperOfBoth);
+
+	return {
+		wrapperOfBoth: wrapperOfBoth,
+		charts: [chart1, chart2]
+	}
+}
+
 module.exports = {
 	injectCSS: injectCSS,
 	createCanvas: createCanvas,
@@ -182,5 +313,10 @@ module.exports = {
 	releaseChart: releaseChart,
 	specsFromFixtures: specsFromFixtures,
 	triggerMouseEvent: triggerMouseEvent,
-	waitForResize: waitForResize
+	waitForResize: waitForResize,
+	waitForAllChartResizes: waitForAllChartResizes,
+	xLimitsOfChartarea: xLimitsOfChartarea,
+	acquireChartWithLayoutGroupId: acquireChartWithLayoutGroupId,
+	acquireChartWithLayoutGroupIdAndScalePosition: acquireChartWithLayoutGroupIdAndScalePosition,
+	acquireTwoSyncedChartsWithOneWrapper: acquireTwoSyncedChartsWithOneWrapper
 };
