@@ -1,7 +1,3 @@
-// This gulpfile is based on
-// https://github.com/chartjs/chartjs-plugin-zoom/blob/master/gulpfile.js
-// which is from Evert Timberg and under MIT license
-
 var gulp = require('gulp'),
     concat = require('gulp-concat'),
     eslint = require('gulp-eslint'),
@@ -17,7 +13,16 @@ var gulp = require('gulp'),
     browserify = require('browserify'),
     streamify = require('gulp-streamify'),
     source = require('vinyl-source-stream'),
-    merge = require('merge-stream');
+    merge = require('merge-stream'),
+    karma = require('karma'),
+    path = require('path'),
+    yargs = require('yargs');
+
+var argv = yargs
+  .option('force-output', {default: false})
+  .option('silent-errors', {default: false})
+  .option('verbose', {default: false})
+  .argv;
 
 var srcDir = './src/';
 var srcFiles = srcDir + '**.js';
@@ -38,6 +43,7 @@ gulp.task('build', buildTask);
 gulp.task('bump', bumpTask);
 gulp.task('lint', lintTask);
 gulp.task('watch', watchTask);
+gulp.task('unittest', unittestTask);
 
 function buildTask() {
   var nonBundled = browserify('./src/chart.layoutsync.js')
@@ -93,22 +99,40 @@ function lintTask() {
     'src/**/*.js'
   ];
 
-  // NOTE(SB) codeclimate has 'complexity' and 'max-statements' eslint rules way too strict
-  // compare to what the current codebase can support, and since it's not straightforward
-  // to fix, let's turn them as warnings and rewrite code later progressively.
-  var options = {
-    rules: {
-      'complexity': [1, 10],
-      'max-statements': [1, 30]
-    }
-  };
-
   return gulp.src(files)
-    .pipe(eslint(options))
+    .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
 }
 
 function watchTask() {
   return gulp.watch(srcFiles, ['lint', 'build']);
+}
+
+function startTest() {
+  return [
+    './node_modules/moment/min/moment.min.js',
+    './test/jasmine.index.js',
+    './src/**/*.js',
+  ].concat(
+    argv.inputs ?
+      argv.inputs.split(';') :
+      ['./test/specs/**/*.js']
+  );
+}
+
+function unittestTask(done) {
+  new karma.Server({
+    configFile: path.join(__dirname, 'karma.conf.js'),
+    singleRun: !argv.watch,
+    files: startTest(),
+    args: {
+      coverage: !!argv.coverage
+    }
+  },
+  // https://github.com/karma-runner/gulp-karma/issues/18
+  function(error) {
+    error = error ? new Error('Karma returned with the error code: ' + error) : undefined;
+    done(error);
+  }).start();
 }

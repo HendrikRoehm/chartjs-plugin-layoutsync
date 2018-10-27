@@ -5,8 +5,7 @@
 
 // Get the chart variable
 var Chart = require('chart.js');
-Chart = typeof(Chart) === 'function' ? Chart : window.Chart;
-var helpers = Chart.helpers;
+Chart = typeof (Chart) === 'function' ? Chart : window.Chart;
 
 var layoutGroups = {};
 
@@ -34,12 +33,12 @@ var layoutsyncPlugin = {
     }
   },
   afterLayout: function (chartInstance, optionalParameter) {
-    var groupId = chartInstance.layoutGroupId
+    var groupId = chartInstance.layoutGroupId;
     if (!groupId) {
       return;
     }
 
-    if (optionalParameter === "layoutSync") {
+    if (optionalParameter === 'layoutSync') {
       // afterLayout is triggered through this function, nothing to do.
       return;
     }
@@ -57,7 +56,7 @@ var layoutsyncPlugin = {
     group.forEach(function (chart) {
       maxLeftWidth = Math.max(maxLeftWidth, chart.initialLayout.left);
       minRightWidth = Math.min(minRightWidth, chart.initialLayout.right);
-    })
+    });
 
     var chartsToUpdate = [];
     group.forEach(function (chart) {
@@ -70,10 +69,10 @@ var layoutsyncPlugin = {
 
       // adjust boxes
       chart.boxes.forEach(function (box) {
-        if (box.position === "left") {
+        if (box.position === 'left') {
           box.left += shiftLeft;
           box.right += shiftLeft;
-        } else if (box.position === "right") {
+        } else if (box.position === 'right') {
           box.left += shiftRight;
           box.right += shiftRight;
         } else {
@@ -83,13 +82,13 @@ var layoutsyncPlugin = {
             box.width += shiftRight - shiftLeft;
           }
         }
-      })
+      });
 
       if (shiftLeft !== 0 || shiftRight !== 0) {
         if (chartInstance === chart) {
           // notify again to distribute the changes
-          Chart.pluginService.notify(chart, "afterLayout", ["layoutSync"]);
-          Chart.pluginService.notify(chart, "afterScaleUpdate");
+          Chart.pluginService.notify(chart, 'afterLayout', ['layoutSync']);
+          Chart.pluginService.notify(chart, 'afterScaleUpdate');
         } else {
           chartsToUpdate.push(chart);
         }
@@ -100,7 +99,7 @@ var layoutsyncPlugin = {
     });
   },
   destroy: function (chartInstance) {
-    var groupId = chartInstance.layoutGroupId
+    var groupId = chartInstance.layoutGroupId;
     if (!groupId) {
       return;
     }
@@ -111,12 +110,12 @@ var layoutsyncPlugin = {
       if (chart === chartInstance) {
         findIndex = index;
       }
-    })
-    if (findIndex != -1) {
-      group.splice(findIndex, 1)
+    });
+    if (findIndex !== -1) {
+      group.splice(findIndex, 1);
     }
   }
-}
+};
 
 module.exports = layoutsyncPlugin;
 Chart.pluginService.register(layoutsyncPlugin);
