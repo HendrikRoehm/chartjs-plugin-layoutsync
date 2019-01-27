@@ -33,7 +33,7 @@ var header = "/*!\n\
  * https://github.com/HendrikRoehm/chartjs-plugin-layoutsync/\n\
  * Version: {{ version }}\n\
  *\n\
- * Copyright 2018 Hendrik Roehm\n\
+ * Copyright 2019 Hendrik Roehm\n\
  * Released under the MIT license\n\
  * https://github.com/HendrikRoehm/chartjs-plugin-layoutsync/blob/master/LICENSE.md\n\
  */\n";

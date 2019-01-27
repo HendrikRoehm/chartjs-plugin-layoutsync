@@ -1,9 +1,9 @@
 /*!
  * chartjs-plugin-layoutsync
  * https://github.com/HendrikRoehm/chartjs-plugin-layoutsync/
- * Version: 0.1.3
+ * Version: 0.2.0
  *
- * Copyright 2018 Hendrik Roehm
+ * Copyright 2019 Hendrik Roehm
  * Released under the MIT license
  * https://github.com/HendrikRoehm/chartjs-plugin-layoutsync/blob/master/LICENSE.md
  */
@@ -17,8 +17,7 @@
 
 // Get the chart variable
 var Chart = require('chart.js');
-Chart = typeof(Chart) === 'function' ? Chart : window.Chart;
-var helpers = Chart.helpers;
+Chart = typeof (Chart) === 'function' ? Chart : window.Chart;
 
 var layoutGroups = {};
 
@@ -27,7 +26,13 @@ var layoutGroups = {};
 // compute left and right maximum values
 // on afterLayout check if left and right max values changed
 // if yes, trigger update of other charts
-// Charts always double trigger afterLayout?
+
+function removeElementFromList(element, list) {
+  var index = list.indexOf(element);
+  if (index > -1) {
+    list.splice(index, 1);
+  }
+}
 
 var layoutsyncPlugin = {
   beforeInit: function (chartInstance) {
@@ -40,18 +45,22 @@ var layoutsyncPlugin = {
     chartInstance.layoutGroupId = groupId;
     var group = layoutGroups[groupId];
     if (group) {
-      group.push(chartInstance);
+      group.members.push(chartInstance);
     } else {
-      layoutGroups[groupId] = [chartInstance];
+      layoutGroups[groupId] = {
+        members: [chartInstance],
+        layout: null,
+        updateQueue: []
+      };
     }
   },
   afterLayout: function (chartInstance, optionalParameter) {
-    var groupId = chartInstance.layoutGroupId
+    var groupId = chartInstance.layoutGroupId;
     if (!groupId) {
       return;
     }
 
-    if (optionalParameter === "layoutSync") {
+    if (optionalParameter === 'layoutSync') {
       // afterLayout is triggered through this function, nothing to do.
       return;
     }
@@ -64,28 +73,41 @@ var layoutsyncPlugin = {
 
     var group = layoutGroups[groupId];
 
+    // detect layout changes
     var maxLeftWidth = 0;
     var minRightWidth = 1000000;
-    group.forEach(function (chart) {
+    group.members.forEach(function (chart) {
       maxLeftWidth = Math.max(maxLeftWidth, chart.initialLayout.left);
       minRightWidth = Math.min(minRightWidth, chart.initialLayout.right);
-    })
+    });
+    var hasLayoutChanged = !group.layout
+      || maxLeftWidth !== group.layout.left
+      || minRightWidth !== group.layout.right;
+    if (hasLayoutChanged) {
+      group.layout = {
+        left: maxLeftWidth,
+        right: minRightWidth
+      };
+      group.updateQueue = group.members.slice();
+    }
 
-    var chartsToUpdate = [];
-    group.forEach(function (chart) {
-      var shiftLeft = maxLeftWidth - chart.chartArea.left;
-      var shiftRight = minRightWidth - chart.chartArea.right;
+    var isLayoutCorrect = chartInstance.initialLayout.left == maxLeftWidth
+      && chartInstance.initialLayout.right == minRightWidth;
+
+    if (!isLayoutCorrect) {
+      var shiftLeft = maxLeftWidth - chartInstance.chartArea.left;
+      var shiftRight = minRightWidth - chartInstance.chartArea.right;
 
       // adjust chart
-      chart.chartArea.left += shiftLeft;
-      chart.chartArea.right += shiftRight;
+      chartInstance.chartArea.left += shiftLeft;
+      chartInstance.chartArea.right += shiftRight;
 
       // adjust boxes
-      chart.boxes.forEach(function (box) {
-        if (box.position === "left") {
+      chartInstance.boxes.forEach(function (box) {
+        if (box.position === 'left') {
           box.left += shiftLeft;
           box.right += shiftLeft;
-        } else if (box.position === "right") {
+        } else if (box.position === 'right') {
           box.left += shiftRight;
           box.right += shiftRight;
         } else {
@@ -95,40 +117,30 @@ var layoutsyncPlugin = {
             box.width += shiftRight - shiftLeft;
           }
         }
-      })
+      });
 
-      if (shiftLeft !== 0 || shiftRight !== 0) {
-        if (chartInstance === chart) {
-          // notify again to distribute the changes
-          Chart.pluginService.notify(chart, "afterLayout", ["layoutSync"]);
-          Chart.pluginService.notify(chart, "afterScaleUpdate");
-        } else {
-          chartsToUpdate.push(chart);
-        }
+      // notify again to distribute the changes
+      Chart.pluginService.notify(chartInstance, 'afterLayout', ['layoutSync']);
+      Chart.pluginService.notify(chartInstance, 'afterScaleUpdate');
+    }
+    removeElementFromList(chartInstance, group.updateQueue);
+    setTimeout(function () {
+      if (group.updateQueue.length > 0) {
+        group.updateQueue[0].update();
       }
-    });
-    chartsToUpdate.forEach(function (chart) {
-      chart.update();
     });
   },
   destroy: function (chartInstance) {
-    var groupId = chartInstance.layoutGroupId
+    var groupId = chartInstance.layoutGroupId;
     if (!groupId) {
       return;
     }
 
     var group = layoutGroups[groupId];
-    var findIndex = -1;
-    group.forEach(function (chart, index) {
-      if (chart === chartInstance) {
-        findIndex = index;
-      }
-    })
-    if (findIndex != -1) {
-      group.splice(findIndex, 1)
-    }
+    removeElementFromList(chartInstance, group.members);
+    removeElementFromList(chartInstance, group.updateQueue);
   }
-}
+};
 
 module.exports = layoutsyncPlugin;
 Chart.pluginService.register(layoutsyncPlugin);

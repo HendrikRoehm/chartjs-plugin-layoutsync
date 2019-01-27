@@ -306,6 +306,12 @@ function acquireTwoSyncedChartsWithOneWrapper() {
 	}
 }
 
+function executeEvents() {
+	return new Promise((resolve, reject) => {
+		setTimeout(resolve);
+	})
+}
+
 module.exports = {
 	injectCSS: injectCSS,
 	createCanvas: createCanvas,
@@ -318,5 +324,6 @@ module.exports = {
 	xLimitsOfChartarea: xLimitsOfChartarea,
 	acquireChartWithLayoutGroupId: acquireChartWithLayoutGroupId,
 	acquireChartWithLayoutGroupIdAndScalePosition: acquireChartWithLayoutGroupIdAndScalePosition,
-	acquireTwoSyncedChartsWithOneWrapper: acquireTwoSyncedChartsWithOneWrapper
+	acquireTwoSyncedChartsWithOneWrapper: acquireTwoSyncedChartsWithOneWrapper,
+	executeEvents: executeEvents
 };

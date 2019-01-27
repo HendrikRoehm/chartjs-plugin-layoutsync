@@ -6,31 +6,40 @@ describe('Layoutsync', function () {
 		expect(chart.layoutGroupId).toEqual("testGroup");
 	});
 
-	it('Charts are synced', function () {
+	it('Charts are synced', function (done) {
 		var chart1 = window.acquireChartWithLayoutGroupIdAndScalePosition("testGroup", "left");
 		var chart2 = window.acquireChartWithLayoutGroupIdAndScalePosition("testGroup", "right");
 
-		expect(xLimitsOfChartarea(chart1)).toEqual(xLimitsOfChartarea(chart2));
+		executeEvents().then(() => {
+			expect(xLimitsOfChartarea(chart1)).toEqual(xLimitsOfChartarea(chart2));
+			done();
+		});
 	});
 
-	it('Charts with different layoutGroups are not synced', function () {
+	it('Charts with different layoutGroups are not synced', function (done) {
 		var chart1 = window.acquireChartWithLayoutGroupIdAndScalePosition("testGroup1", "left");
 		var chart2 = window.acquireChartWithLayoutGroupIdAndScalePosition("testGroup2", "right");
 
-		expect(xLimitsOfChartarea(chart1).left).not
-			.toEqual(xLimitsOfChartarea(chart2).left);
-		expect(xLimitsOfChartarea(chart1).right).not
-			.toEqual(xLimitsOfChartarea(chart2).right);
+		executeEvents().then(() => {
+			expect(xLimitsOfChartarea(chart1).left).not
+				.toEqual(xLimitsOfChartarea(chart2).left);
+			expect(xLimitsOfChartarea(chart1).right).not
+				.toEqual(xLimitsOfChartarea(chart2).right);
+			done();
+		});
 	});
 
-	it('Charts without layoutGroups are not synced', function () {
+	it('Charts without layoutGroups are not synced', function (done) {
 		var chart1 = window.acquireChartWithLayoutGroupIdAndScalePosition(undefined, "left");
 		var chart2 = window.acquireChartWithLayoutGroupIdAndScalePosition(undefined, "right");
 
-		expect(xLimitsOfChartarea(chart1).left).not
-			.toEqual(xLimitsOfChartarea(chart2).left);
-		expect(xLimitsOfChartarea(chart1).right).not
-			.toEqual(xLimitsOfChartarea(chart2).right);
+		executeEvents().then(() => {
+			expect(xLimitsOfChartarea(chart1).left).not
+				.toEqual(xLimitsOfChartarea(chart2).left);
+			expect(xLimitsOfChartarea(chart1).right).not
+				.toEqual(xLimitsOfChartarea(chart2).right);
+			done();
+		});
 	});
 
 	it('Charts are synced after resize', function (done) {
@@ -41,7 +50,7 @@ describe('Layoutsync', function () {
 		xLimitsChart1BeforeResizing = xLimitsOfChartarea(chart1);
 
 		wrapperOfBoth.style.width = '1000px';
-		waitForAllChartResizes(wrapperAndCharts.charts, function () {
+		executeEvents().then(() => {
 			expect(xLimitsOfChartarea(chart1)).toEqual(xLimitsOfChartarea(chart2));
 			expect(xLimitsOfChartarea(chart1)).not.toEqual(xLimitsChart1BeforeResizing);
 			done();

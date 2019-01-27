@@ -1,6 +1,6 @@
 {
   "name": "chartjs-plugin-layoutsync",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Chart.js plugin to sync layouts between charts",
   "main": "src/chart.layoutsync.js",
   "author": "Hendrik Roehm",

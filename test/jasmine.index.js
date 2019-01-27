@@ -35,6 +35,7 @@ var utils = require('./jasmine.utils');
 	window.acquireChartWithLayoutGroupId = utils.acquireChartWithLayoutGroupId;
 	window.acquireChartWithLayoutGroupIdAndScalePosition = utils.acquireChartWithLayoutGroupIdAndScalePosition;
 	window.acquireTwoSyncedChartsWithOneWrapper = utils.acquireTwoSyncedChartsWithOneWrapper;
+	window.executeEvents = utils.executeEvents;
 
 	// some style initialization to limit differences between browsers across different plateforms.
 	utils.injectCSS(
