@@ -1,8 +1,10 @@
 # chartjs-plugin-layoutsync
 
-A layout synchronisation plugin for Chart.js. Currently requires Chart.js >= 2.6.0
+A layout synchronisation plugin for Chart.js. Currently requires Chart.js >= 2.9.0
 
 Columns of charts with the same width are synchronized, such that the chart area is aligned.
+The alignment works by changing the `options.layout.padding` configuration parameter of each chart.
+Hence, it will currently overwrite manually assigned left and right paddings.
 
 ## Configuration
 
