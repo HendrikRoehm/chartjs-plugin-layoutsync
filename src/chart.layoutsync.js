@@ -71,7 +71,8 @@ var layoutsyncPlugin = {
       layoutGroups[groupId] = {
         members: [chartInstance],
         layout: null,
-        updateQueue: []
+        updateQueue: [],
+        chartLastWidth: {}
       };
     }
   },
@@ -86,14 +87,17 @@ var layoutsyncPlugin = {
       return
     }
 
+    var lastWidth = group.chartLastWidth[chartInstance.id]
+    var widthDiff = lastWidth ? chartInstance.width - lastWidth : 0;
+
     var isLayoutCorrect = chartInstance.chartArea.left === group.layout.left
-      && chartInstance.chartArea.right === group.layout.right
+      && chartInstance.chartArea.right + widthDiff === group.layout.right
 
     if (!isLayoutCorrect) {
       var shiftLeft = group.layout.left - chartInstance.chartArea.left
-      var shiftRight = group.layout.right - chartInstance.chartArea.right
+      var shiftRight = chartInstance.chartArea.right - group.layout.right + widthDiff
       shiftPadding("left", chartInstance, shiftLeft)
-      shiftPadding("right", chartInstance, -shiftRight)
+      shiftPadding("right", chartInstance, shiftRight)
     }
   },
   afterLayout: function (chartInstance) {
@@ -103,6 +107,7 @@ var layoutsyncPlugin = {
     }
 
     var group = layoutGroups[groupId];
+    group.chartLastWidth[chartInstance.id] = chartInstance.width
 
     // detect layout changes
     var maxLeftWidth = 0;
@@ -118,6 +123,7 @@ var layoutsyncPlugin = {
     maxLeftWidth -= minPaddingLeft
     minRightWidth += minPaddingRight
     
+
     var hasLayoutChanged = !group.layout
       || maxLeftWidth !== group.layout.left
       || minRightWidth !== group.layout.right
