@@ -107,7 +107,11 @@ var layoutsyncPlugin = {
     }
 
     var group = layoutGroups[groupId];
-    group.chartLastWidth[chartInstance.id] = chartInstance.width
+    if (group.chartLastWidth[chartInstance.id] !== chartInstance.width) {
+      group.chartLastWidth[chartInstance.id] = chartInstance.width
+      addElementIfNotAlreadyInList(chartInstance, group.updateQueue)
+    }
+    
 
     // detect layout changes
     var maxLeftWidth = 0;
@@ -122,7 +126,6 @@ var layoutsyncPlugin = {
     })
     maxLeftWidth -= minPaddingLeft
     minRightWidth += minPaddingRight
-    
 
     var hasLayoutChanged = !group.layout
       || maxLeftWidth !== group.layout.left
