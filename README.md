@@ -1,3 +1,5 @@
+This project is archived and not maintained anymore.
+
 # chartjs-plugin-layoutsync
 
 A layout synchronisation plugin for Chart.js. Currently requires Chart.js >= 2.9.0
